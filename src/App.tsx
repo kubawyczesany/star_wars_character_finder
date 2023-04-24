@@ -89,7 +89,6 @@ const App: React.FC = () => {
                 };
               })
             );
-            console.log(characters);
             setCharactersByPlanet(charactersByPlanet);
           }
         }
