@@ -1,3 +1,18 @@
+@font-face {
+  font-family: "Star Jedi";
+  src: url("../fonts/Starjedi.ttf") format("truetype");
+}
+
+body {
+  background: #000
+    url("https://lumiere-a.akamaihd.net/v1/images/star-wars-backgrounds-25_bc15ec98.jpeg");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -11,31 +26,34 @@
   border: none;
   border-radius: 5px;
   margin-right: 10px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.3);
   width: 300px;
   font-size: 16px;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-family: "Star Jedi";
 }
 
 .search:hover {
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
 }
 
 .btn {
-  background-color: #333;
-  color: #fff;
+  background-color: #ffc107;
+  color: #000;
   border: none;
   border-radius: 5px;
   padding: 10px 20px;
   cursor: pointer;
   font-size: 16px;
-  margin-left: 10px;
+  font-family: "Star Jedi";
+  margin: 30px 0px 30px 0px;
 }
 
 .btn:hover {
-  background-color: #fff;
-  color: #333;
-  border: 1px solid #333;
+  background-color: #000;
+  color: #ffc107;
+  transition: all 0.5s ease-in-out;
 }
 
 .btn:active {
@@ -45,6 +63,11 @@
 .list {
   margin-top: 20px;
   padding: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-color: #ffc107;
+  scrollbar-width: thin;
+  max-height: 30vh;
 }
 
 .listItem {
@@ -52,16 +75,53 @@
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.3);
   font-size: 16px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: "Star Jedi";
+  cursor: pointer;
+  color: #ffc107;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease-in-out;
 }
 
-.characterMovies {
+.listItem:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.characterfilms {
   margin-bottom: 20px;
+  color: #ffc107;
 }
 
-body {
-  background: linear-gradient(45deg, #e66465, #9198e5);
-  height: 100vh;
+.listTitle {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffc107;
+}
+
+h1 {
+  font-family: "Star Jedi";
+  color: #ffc107;
+}
+
+p {
+  font-family: "Star Jedi";
+  color: #ffc107;
+  font-size: 12px;
+}
+.img {
+  max-height: 20vh;
+}
+.filmTitle {
+  color: chartreuse;
+}
+.filmList {
+  max-height: 7em;
+  margin-top: 20px;
+  padding: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

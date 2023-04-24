@@ -1,51 +1,102 @@
 import React, { useState } from "react";
-import CharacterMovies from "./components/CharacterMovies";
+import CharacterList from "./components/CharacterList";
+import Texts from "./texts/texts";
 import "./styles/styles.css";
 
 type Character = {
   name: string;
   homeworld: string;
   homeworldPopulation: string;
-  films: Film[];
+  films: string[];
   url: string;
 };
 
-type Film = {
-  title: string;
-  releaseDate: string;
-  openingCrawl: string;
+type Planet = {
+  name: string;
+  population: string;
+  residents: Array<any>;
+  characters: Array<any>;
 };
 
 const App: React.FC = () => {
   const [searchInput, setSearchInput] = useState("");
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [charactersByPlanet, setCharactersByPlanets] = useState<Character[]>(
-    []
-  );
+  const [charactersByPlanet, setCharactersByPlanet] = useState<Planet[]>([]);
+  const [charactersByPopulation, setCharactersByPopulation] = useState<
+    Character[]
+  >([]);
 
   const handleClick = async () => {
     try {
-      const charactersData = await (
-        await fetch(`https://swapi.dev/api/people/?search=${searchInput}`)
-      ).json();
-      setCharacters(charactersData.results);
-      if (charactersData.count === 0) {
-        const homeworldData = await (
-          await fetch(`https://swapi.dev/api/planets/?search=${searchInput}`)
+      let page = 1;
+      let charactersData = [];
+      let allCharacters: Character[] = [];
+      let planetData = [];
+      do {
+        charactersData = await (
+          await fetch(
+            `https://swapi.dev/api/people/?page=${page}&search=${searchInput}`
+          )
         ).json();
-        let homeworld = homeworldData.results;
-        let charactersHomeworldArr = [];
-        for (let i = 0; i < Object.keys(homeworld).length; i++) {
-          let homeworldResidents = homeworld[i].residents;
-          for (let n = 0; n < Object.keys(homeworldResidents).length; n++) {
-            const charactersHomeworld = await (
-              await fetch(homeworldResidents[n])
-            ).json();
-            charactersHomeworldArr.push(charactersHomeworld);
+        if (charactersData.count === 0) {
+          planetData = await (
+            await fetch(`https://swapi.dev/api/planets/?search=${searchInput}`)
+          ).json();
+          if (planetData.count === 0) {
+            let planetFound = null;
+            let planetPage = 1;
+            do {
+              const planetsData = await (
+                await fetch(`https://swapi.dev/api/planets/?page=${planetPage}`)
+              ).json();
+              planetFound = planetsData.results.find(
+                (planet: Planet) => planet.population === searchInput
+              );
+              if (planetFound) break;
+              planetPage++;
+            } while (planetData.next);
+            if (planetFound) {
+              const characterPromises = planetFound.residents.map(
+                async (url: string) => {
+                  const characterData = await fetch(url).then((res) =>
+                    res.json()
+                  );
+                  return characterData;
+                }
+              );
+              const charactersByPlanetPopulation = await Promise.all(
+                characterPromises
+              );
+              setCharactersByPopulation(charactersByPlanetPopulation);
+              return;
+            }
+          } else {
+            const charactersByPlanet = await Promise.all(
+              planetData.results.map(async (planet: Planet) => {
+                let characters = [];
+                const characterPromises = planet.residents.map(
+                  async (url: string) => {
+                    const characterData = await fetch(url).then((res) =>
+                      res.json()
+                    );
+                    return characterData;
+                  }
+                );
+                characters = await Promise.all(characterPromises);
+                return {
+                  ...planet,
+                  characters,
+                };
+              })
+            );
+            console.log(characters);
+            setCharactersByPlanet(charactersByPlanet);
           }
         }
-        setCharactersByPlanets(charactersHomeworldArr);
-      }
+        allCharacters = [...allCharacters, ...charactersData.results];
+        page++;
+      } while (charactersData.next);
+      setCharacters(allCharacters);
     } catch (err) {
       console.log(err);
     }
@@ -54,6 +105,8 @@ const App: React.FC = () => {
   return (
     <>
       <div className="container">
+        <img src={Texts.imgLink} className="img"></img>
+        <h1>{Texts.appname}</h1>
         <input
           className="search"
           type="search"
@@ -62,19 +115,23 @@ const App: React.FC = () => {
           onChange={(e) => setSearchInput(e.target.value)}
         />
         <button className="btn" type="submit" onClick={handleClick}>
-          Search
+          {Texts.buttonPlaceholder}
         </button>
         <ul className="list">
-          {characters.map((character) => (
-            <CharacterMovies character={character} />
-          ))}
-        </ul>
-        <ul className="list">
-          {charactersByPlanet.map((item, index) => (
-            <li className="listItem" key={index}>
-              {item.name}
-            </li>
-          ))}
+          {characters &&
+            characters.map((character) => (
+              <CharacterList character={character} />
+            ))}
+          {charactersByPlanet &&
+            charactersByPlanet.map((planet) =>
+              planet.characters?.map((characters) => (
+                <CharacterList character={characters} />
+              ))
+            )}
+          {charactersByPopulation &&
+            charactersByPopulation.map((character) => (
+              <CharacterList character={character} />
+            ))}
         </ul>
       </div>
     </>
